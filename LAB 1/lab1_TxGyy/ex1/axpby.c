@@ -5,6 +5,29 @@
 
 void axpby(double* x, double* y, double a, double b, int n) {
     // TODO
+    int n;
+    size_t n_a = sizeof(x)/sizeof(x[0]);
+    size_t n_b = sizeof(y)/sizeof(y[0]);
+    if (n_a != n_b){
+        break;
+    }else{
+        n = n_a;
+    }
+    pritnf("First vector\n")
+    for (int i = 0; i < n; i++){
+        pritnf("%lf"; x[i])
+    }
+    pritnf("\nSecond vector\n")
+    for (int i = 0; i < n; i++){
+        pritnf("%lf"; y[i])
+    }
+    for (int i = 0; i < n; i++){
+        y[i] = a*x[i] + b*[i];
+    }
+    pritnf("\nResult\n")
+    for (int i = 0; i < n; i++){
+        pritnf("%lf"; y[i])
+    }
 }
 
 void axpby_openmp(double* x, double* y, double a, double b, int n) {
