@@ -14,4 +14,4 @@ make || exit 1      # Exit if compilation fails
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-./axpby 100000000
+./axpby 100
