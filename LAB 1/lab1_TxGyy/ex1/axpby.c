@@ -5,46 +5,19 @@
 
 void axpby(double* x, double* y, double a, double b, int n) {
 
-    printf("First vector\n");
-    for(int i = 0; i < n; i++){
-        printf("%lf ", a*x[i]);
-    }
-    printf("\nSecond vector\n");
-    for (int i = 0; i < n; i++){
-        printf("%lf ", b*y[i]);
-    }
     for (int i = 0; i < n; i++){
         y[i] = a*x[i] + b*y[i];
     }
-    printf("\nResult\n");
-    for (int i = 0; i < n; i++){
-        printf("%lf ", y[i]);
-    }
+
 }
 
 void axpby_openmp(double* x, double* y, double a, double b, int n) {
     
-    printf("First vector\n");
-    #pragma omp parallel for
-    for(int i = 0; i < n; i++){
-        printf("%lf ", x[i]);
-    }
-
-    printf("\nSecond vector\n");
-    #pragma omp parallel for
-    for (int i = 0; i < n; i++){
-        printf("%lf ", y[i]);
-    }
     #pragma omp parallel for
     for (int i = 0; i < n; i++){
         y[i] = a*x[i] + b*y[i];
     }
-
-    printf("\nResult\n");
-    #pragma omp parallel for
-    for (int i = 0; i < n; i++){
-        printf("%lf ", y[i]);
-    }
+    
 }
 
 

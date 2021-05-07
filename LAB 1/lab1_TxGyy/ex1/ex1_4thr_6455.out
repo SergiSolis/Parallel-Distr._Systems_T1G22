@@ -1,0 +1,23 @@
+gcc main.c axpby.c -o axpby -fopenmp -lm
+Using 2400MB of memory
+
+
+Initialization
+
+
+axpby sequential
+Data: 1600 MB
+Time: 0.601504 sec
+Throughput: 0.00 GB/s
+
+
+axpby OpenMP
+Data: 1600 MB
+Time: 0.151346 sec
+Throughput: 0.00 GB/s
+
+
+axpby OpenMP no for
+Data: 1600 MB
+Time: 0.000000 sec
+Throughput: 0.00 GB/s
