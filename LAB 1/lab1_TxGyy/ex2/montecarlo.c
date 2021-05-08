@@ -25,7 +25,7 @@ int main () {
 
     start = omp_get_wtime();
 
-    // TODO parallelise
+    #pragma omp parallel for reduction(+:total)
     for(i=0;i<steps; i++) {
 
         random_next = (MULTIPLIER  * random_last + ADDEND)% PMOD;
@@ -44,7 +44,6 @@ int main () {
     }
 
     end = omp_get_wtime();
-
     pi = 4.0 * ((double)total/(double)steps);
     printf("i is %f \n\n", pi);
     printf("Elapsed time for Monte Carlo %f\n\n",end-start);
