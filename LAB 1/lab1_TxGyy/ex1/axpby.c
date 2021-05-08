@@ -22,7 +22,13 @@ void axpby_openmp(double* x, double* y, double a, double b, int n) {
 
 
 void axpby_openmp_nofor(double* x, double* y, double a, double b, int n) {
-    // TODO
+    #pragma omp parallel
+	{
+	printf("Thread %d/%d [%d,%d]\n",omp_get_thread_num(),omp_get_num_threads(),omp_get_thread_num()*(n/omp_get_num_threads()),(omp_get_thread_num()+1)*(n/omp_get_num_threads()));
+	for (int i = omp_get_thread_num()*(n/omp_get_num_threads()); i < (omp_get_thread_num()+1)*(n/omp_get_num_threads()); i++){
+        y[i] = a*x[i] + b*y[i];
+    }
+	}
 }
 
 
