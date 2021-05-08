@@ -37,6 +37,7 @@ void print_stats(double start, double end, long int data_size) {
     double throughput = 0.0;
     elapsed = end - start;
     // TODO throughput
+	throughput = ((double)(data_size/MEGA)/elapsed)/1000;
     printf("Data: %.0f MB\n", (double)(data_size/MEGA));
     printf("Time: %f sec\n", elapsed);
     printf("Throughput: %.2f GB/s\n", throughput);
