@@ -7,17 +7,19 @@ Initialization
 
 axpby sequential
 Data: 1600 MB
-Time: 0.601504 sec
-Throughput: 0.00 GB/s
+Time: 0.609742 sec
+Throughput: 2.62 GB/s
 
 
 axpby OpenMP
 Data: 1600 MB
-Time: 0.151346 sec
-Throughput: 0.00 GB/s
+Time: 0.305467 sec
+Throughput: 5.24 GB/s
 
 
 axpby OpenMP no for
+Thread 0/2 [0,50000000]
+Thread 1/2 [50000000,100000000]
 Data: 1600 MB
-Time: 0.000000 sec
-Throughput: 0.00 GB/s
+Time: 0.414260 sec
+Throughput: 3.86 GB/s
