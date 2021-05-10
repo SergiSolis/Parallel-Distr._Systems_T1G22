@@ -38,13 +38,15 @@ int main(int argc, char * argv[]) {
     }
 
     start = omp_get_wtime();
-    // TODO parallelise with OpenMP
+    #pragma omp parallel for shared(i)
     for (i = 0; i < Y_RES; i++) {
         y0 = Y_MAX - i * dy;
+        #pragma omp parallel shared(j)
         for (j = 0; j < X_RES; j++) {
             x = 0.0;
             y = 0.0;
             x0 = X_MIN + j * dx;
+            //#pragma omp parallel private(x,y)
             for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
                 xtmp = x * x - y * y + x0;
                 y = 2 * x * y + y0;
