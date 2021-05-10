@@ -30,7 +30,7 @@ int main(int argc, char * argv[]) {
 
     const char *filename = "mandelbrot.ppm";
     FILE *file;
-
+ 
     M = (int**) malloc(Y_RES * sizeof(int*));
 
     for (int i = 0; i < Y_RES; i++) {
@@ -38,15 +38,13 @@ int main(int argc, char * argv[]) {
     }
 
     start = omp_get_wtime();
-    #pragma omp parallel for shared(i)
+    #pragma omp parallel for
     for (i = 0; i < Y_RES; i++) {
         y0 = Y_MAX - i * dy;
-        #pragma omp parallel shared(j)
         for (j = 0; j < X_RES; j++) {
             x = 0.0;
             y = 0.0;
             x0 = X_MIN + j * dx;
-            //#pragma omp parallel private(x,y)
             for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
                 xtmp = x * x - y * y + x0;
                 y = 2 * x * y + y0;
@@ -56,7 +54,104 @@ int main(int argc, char * argv[]) {
         }
     }
     end = omp_get_wtime();
-    printf("Mandelbrot took %f sec\n", end - start);
+    printf("Mandelbrot static took %f sec\n", end - start);
+	
+	//test
+	start = omp_get_wtime();
+    #pragma omp parallel for schedule(static,1)
+    for (i = 0; i < Y_RES; i++) {
+        y0 = Y_MAX - i * dy;
+        for (j = 0; j < X_RES; j++) {
+            x = 0.0;
+            y = 0.0;
+            x0 = X_MIN + j * dx;
+            for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
+                xtmp = x * x - y * y + x0;
+                y = 2 * x * y + y0;
+                x = xtmp;
+            };
+            M[i][j] = iter;
+        }
+    }
+    end = omp_get_wtime();
+    printf("Mandelbrot static 1 took %f sec\n", end - start);
+	
+	start = omp_get_wtime();
+    #pragma omp parallel for schedule(dynamic)
+    for (i = 0; i < Y_RES; i++) {
+        y0 = Y_MAX - i * dy;
+        for (j = 0; j < X_RES; j++) {
+            x = 0.0;
+            y = 0.0;
+            x0 = X_MIN + j * dx;
+            for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
+                xtmp = x * x - y * y + x0;
+                y = 2 * x * y + y0;
+                x = xtmp;
+            };
+            M[i][j] = iter;
+        }
+    }
+    end = omp_get_wtime();
+    printf("Mandelbrot dynamic took %f sec\n", end - start);
+	
+	start = omp_get_wtime();
+    #pragma omp parallel for schedule(dynamic,2)
+    for (i = 0; i < Y_RES; i++) {
+        y0 = Y_MAX - i * dy;
+        for (j = 0; j < X_RES; j++) {
+            x = 0.0;
+            y = 0.0;
+            x0 = X_MIN + j * dx;
+            for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
+                xtmp = x * x - y * y + x0;
+                y = 2 * x * y + y0;
+                x = xtmp;
+            };
+            M[i][j] = iter;
+        }
+    }
+    end = omp_get_wtime();
+    printf("Mandelbrot dynamic 2 took %f sec\n", end - start);
+	
+	start = omp_get_wtime();
+    #pragma omp parallel for schedule(guided)
+    for (i = 0; i < Y_RES; i++) {
+        y0 = Y_MAX - i * dy;
+        for (j = 0; j < X_RES; j++) {
+            x = 0.0;
+            y = 0.0;
+            x0 = X_MIN + j * dx;
+            for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
+                xtmp = x * x - y * y + x0;
+                y = 2 * x * y + y0;
+                x = xtmp;
+            };
+            M[i][j] = iter;
+        }
+    }
+    end = omp_get_wtime();
+    printf("Mandelbrot guided took %f sec\n", end - start);
+	
+	start = omp_get_wtime();
+    #pragma omp parallel for schedule(guided,2)
+    for (i = 0; i < Y_RES; i++) {
+        y0 = Y_MAX - i * dy;
+        for (j = 0; j < X_RES; j++) {
+            x = 0.0;
+            y = 0.0;
+            x0 = X_MIN + j * dx;
+            for (iter = 0; (x * x + y * y <= 4.0) && iter < ITER_MAX; iter++) {
+                xtmp = x * x - y * y + x0;
+                y = 2 * x * y + y0;
+                x = xtmp;
+            };
+            M[i][j] = iter;
+        }
+    }
+    end = omp_get_wtime();
+    printf("Mandelbrot guided 2 took %f sec\n", end - start);
+	
 
     file = fopen(filename, "wb");
     fprintf(file, "P6 %d %d %d\n", X_RES, Y_RES, (ITER_MAX < 256 ? 256 : ITER_MAX));
