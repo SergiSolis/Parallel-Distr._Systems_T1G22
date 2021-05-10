@@ -152,6 +152,7 @@ int main(int argc, char * argv[]) {
     end = omp_get_wtime();
     printf("Mandelbrot guided 2 took %f sec\n", end - start);
 	
+	//end test
 
     file = fopen(filename, "wb");
     fprintf(file, "P6 %d %d %d\n", X_RES, Y_RES, (ITER_MAX < 256 ? 256 : ITER_MAX));

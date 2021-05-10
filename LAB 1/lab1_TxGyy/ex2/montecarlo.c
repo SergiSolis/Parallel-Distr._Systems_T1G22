@@ -25,7 +25,7 @@ int main () {
 
     start = omp_get_wtime();
 
-    #pragma omp parallel for
+    #pragma omp parallel for reduction(+:total)
     for(i=0;i<steps; i++) {
 
         random_next = (MULTIPLIER  * random_last + ADDEND)% PMOD;
@@ -39,7 +39,6 @@ int main () {
         dist = x*x + y*y;
 
         if (dist <= r*r) {
-            #pragma omp atomic
             total++;
         }
     }
