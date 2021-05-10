@@ -1,0 +1,5 @@
+gcc montecarlo.c -o montecarlo -fopenmp -lm -O2 -DNTHREADS=4
+i is 3.141588 
+
+Elapsed time for Monte Carlo 0.215667
+
