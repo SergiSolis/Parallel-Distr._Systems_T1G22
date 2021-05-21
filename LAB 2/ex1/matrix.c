@@ -17,12 +17,24 @@ int *new_matrix (int size, int rank)
 
 void init_matrix (int *matrix, int size, int rank)
 {
-   // TODO: initialize a matrix with size*size dimensions 
+   //initialize a matrix with size*size dimensions 
+   for (int i=0; i < size; i++){
+      for(int j=0; j < size; j++){
+         matrix[i][j] = 0;
+      }
+   }
 }
 
 void print_matrix (int *matrix, int size)
 {
-   // TODO: print the matrix 
+   //print the matrix 
+    for (int i=0; i < size; i++){
+       printf(" (");
+      for(int j=0; j < size; j++){
+         printf("%d ", matrix[i][j]);
+      }
+      printf(")\n");
+   }
 }
 
 int main (int argc, char* argv[]) 
