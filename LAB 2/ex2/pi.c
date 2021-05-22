@@ -14,16 +14,22 @@ double f(double a)
 double pi_cont_dist (long nrect, int rank, int nprocs)
 {
    // TODO
-   int a= 0; //limites
-   int b=1;
-   int width = (b - a)/nrect;
-   int x, sum;
-   for (int i= 0; i<nrect;i++){
-       x = a + (i-1)*width;
-       sum += width * f(x);
-   }
+    double prect = nrect / nprocs;
 
-   printf("");
+    double a= 0;
+    double b=1;
+    double width = (b - a)/nrect;
+    double x, local_sum = 0;
+    for (int i= rank * prect; i< (rank + 1) * prect;i++){
+        x = a + (i-1)*width;
+        local_sum += width * f(x);
+    }
+
+    double global_sum;
+
+    MPI_Reduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    return global_sum;
+ 
 }
 
 double pi_gaps_dist (long nrect, int rank, int nprocs)
@@ -36,7 +42,7 @@ int main (int argc, char *argv[])
 {
   int    rank, nprocs;
   long   nrect;
-  double pi, time;
+  double pi, time, start, end;
 
   /* MPI Initialization */
   MPI_Init (&argc, &argv);
@@ -58,12 +64,13 @@ int main (int argc, char *argv[])
   }
 
   /* Compute pi using continuous distribution */
-
+  start = MPI_Wtime();
   pi = pi_cont_dist (nrect, rank, nprocs);
+  end = MPI_Wtime();
 
   if (rank == 0)
   {
-     time = //TODO
+     time = end - start;
      printf("Pi    = %.16f \n", pi);
      printf("Time continuous distr. = %.4f \n\n", time);
      fflush(stdout);
@@ -75,9 +82,9 @@ int main (int argc, char *argv[])
 
   if (rank == 0)
   {
-     time = // TODO
+     //time = // TODO
      printf("Pi    = %.16f \n", pi);
-     printf("Time distr. with gaps = %.4f \n", time);
+     //printf("Time distr. with gaps = %.4f \n", time);
      fflush(stdout);
    }
 
