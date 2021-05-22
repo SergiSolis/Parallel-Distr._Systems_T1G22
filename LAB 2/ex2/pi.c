@@ -14,6 +14,16 @@ double f(double a)
 double pi_cont_dist (long nrect, int rank, int nprocs)
 {
    // TODO
+   int a= 0; //limites
+   int b=1;
+   int width = (b - a)/nrect;
+   int x, sum;
+   for (int i= 0; i<nrect;i++){
+       x = a + (i-1)*width;
+       sum += width * f(x);
+   }
+
+   printf("");
 }
 
 double pi_gaps_dist (long nrect, int rank, int nprocs)
