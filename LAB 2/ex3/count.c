@@ -50,7 +50,9 @@ int main (int argc, char **argv)
 	int recordtypesize, numrecords;
 	
    /* Each process reads a part of the file */
-
+   
+	//no idea what to do here
+	
    /* Each process determines number of records to read and initial offset */
 	MPI_File_get_size (fh, &filesize);
 	MPI_Type_size (recordtype, &recordtypesize);
@@ -65,7 +67,21 @@ int main (int argc, char **argv)
 	MPI_File_read (fh, buf, numrecords, recordtype, &status);
 
    /* Cound results by each process */
-	
+   total = 0;
+   for(int i = 0; i < MAX_QUEST; i++){
+	   totYes[i] = 0;
+	   totNo[i] = 0;
+   }
+	for(int i = 0; i < numrecords; i++){
+		total = total + (buf[i].yes + buf[i].no);
+		switch(buf[i].idQuestion){
+			case 0: totYes[0] += buf[i].yes; totNo[0] += buf[i].no; break;
+			case 1: totYes[1] += buf[i].yes; totNo[1] += buf[i].no; break;
+			case 2: totYes[2] += buf[i].yes; totNo[2] += buf[i].no; break;
+			case 3: totYes[3] += buf[i].yes; totNo[3] += buf[i].no; break;
+			case 4: totYes[4] += buf[i].yes; totNo[4] += buf[i].no; break;
+		}
+	}
    /* Print local results */
    printf ("Proc %3d. Counted votes = %d\n", rank, total);
    fflush (stdout);
