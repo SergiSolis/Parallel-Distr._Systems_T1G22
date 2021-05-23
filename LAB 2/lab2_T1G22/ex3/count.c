@@ -69,6 +69,12 @@ int main (int argc, char **argv)
    /* Cound results by each process */
    total = 0;
    long localYes[MAX_QUEST],localNo[MAX_QUEST];
+	for(int i = 0; i < MAX_QUEST; i++){
+		localYes[i] = 0;
+		localNo[i] = 0;
+		totYes[i] = 0;
+		totNo[i] = 0;
+	}
 
 	for(int i = 0; i < numrecords; i++){
 		total = total + (buf[i].yes + buf[i].no);
@@ -97,7 +103,7 @@ int main (int argc, char **argv)
       for (i=0; i<MAX_QUEST; i++) 
       {
          total += totYes[i] + totNo[i];
-	 printf("Question %d: yes: %.1f%% (%d) no: %.1f%% (%d)\n", i, totYes[i]*100.0/(totYes[i] + totNo[i]), totYes[i], totNo[i]*100.0/(totYes[i] + totNo[i]), totNo[i]);
+		 printf("Question %d: yes: %.1f%% (%d) no: %.1f%% (%d)\n", i, totYes[i]*100.0/(totYes[i] + totNo[i]), totYes[i], totNo[i]*100.0/(totYes[i] + totNo[i]), totNo[i]);
          fflush (stdout);
       }
 
