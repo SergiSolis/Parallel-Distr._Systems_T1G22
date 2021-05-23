@@ -19,7 +19,7 @@ void init_matrix (int *matrix, int size, int rank)
 {
 	int x = 1;
 	int diagonal;
-   //initialize a matrix with size*size dimensions 
+   // Initialize a matrix with size*size dimensions 
    for (int i=0; i < size*size; i++){
 		diagonal = size*x - x;
 		if(i == diagonal && x <= size){
@@ -33,11 +33,11 @@ void init_matrix (int *matrix, int size, int rank)
 
 void print_matrix (int *matrix, int size)
 {
-   //print the matrix 
-    for (int i=0; i < size*size; i++){
-	if(i % size == 0){
-		printf("\n");
-	}
+   // Print the matrix 
+   for (int i=0; i < size*size; i++){
+	   if(i % size == 0){
+		   printf("\n");
+	   }
       printf("%d\t", matrix[i]);
    }
 }
@@ -69,8 +69,8 @@ int main (int argc, char* argv[])
    /* Datatype vector creation */
    
 	MPI_Datatype antidiagonaltype;
-    MPI_Type_vector(size, 1, size-1, MPI_INT, &antidiagonaltype);
-    MPI_Type_commit(&antidiagonaltype);
+   MPI_Type_vector(size, 1, size-1, MPI_INT, &antidiagonaltype);
+   MPI_Type_commit(&antidiagonaltype);
 	
    /* Communication: root gathers all the diagonals from the other ranks */
    

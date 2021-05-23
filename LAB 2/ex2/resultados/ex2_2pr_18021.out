@@ -1,0 +1,8 @@
+mpicc pi.c -o pi 
+rect. = 100000000
+
+Pi    = 3.1415926835902788 
+Time continuous distr. = 0.2064 
+
+Pi    = 3.1415926835900683 
+Time distr. with gaps = 0.1948 

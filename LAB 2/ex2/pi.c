@@ -13,20 +13,22 @@ double f(double a)
 
 double pi_cont_dist (long nrect, int rank, int nprocs)
 {
-   // TODO
+    // Define the number of rectangles that each process will use
     double prect = nrect / nprocs;
-
+    // Limits of the integral
     double a= 0;
     double b= 1;
+    // Compute the width of each rectangle
     double width = (b - a)/nrect;
     double x, local_sum = 0;
+    // Rectangle Method with Continuous Distribution
     for (int i = rank * prect; i < (rank + 1) * prect;i++){
         x = a + (i-1)*width;
         local_sum += width * f(x);
     }
 
     double global_sum;
-
+    // Sum the values of all the processes in process 0 to get the value of PI
     MPI_Reduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     return global_sum;
  
@@ -34,19 +36,20 @@ double pi_cont_dist (long nrect, int rank, int nprocs)
 
 double pi_gaps_dist (long nrect, int rank, int nprocs)
 {
-   // TODO
-   
+    // Limits of the integral
     double a= 0;
     double b= 1;
+    // Compute the width of each rectangle
     double width = (b - a)/nrect;
     double x, local_sum = 0;
-    for (int i = rank; i < nrect;i+=rank){
+    // Rectangle Method with Distribution with gaps
+    for (int i = rank; i < nrect;i+= nprocs){
         x = a + (i-1)*width;
         local_sum += width * f(x);   
     }
 
     double global_sum;
-
+    // Sum the values of all the processes in process 0 to get the value of PI
     MPI_Reduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     return global_sum;
 }
@@ -78,6 +81,7 @@ int main (int argc, char *argv[])
   }
 
   /* Compute pi using continuous distribution */
+  // Use MPI_Wtime to measure performance
   start = MPI_Wtime();
   pi = pi_cont_dist (nrect, rank, nprocs);
   end = MPI_Wtime();
@@ -91,7 +95,7 @@ int main (int argc, char *argv[])
    }
 
   /* Compute pi using distribution with gaps */
-  
+  // Use MPI_Wtime to measure performance
   start = MPI_Wtime();
   pi = pi_gaps_dist (nrect, rank, nprocs);
   end = MPI_Wtime();

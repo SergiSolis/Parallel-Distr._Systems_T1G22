@@ -5,8 +5,8 @@ import matplotlib.ticker as ticker
 procs = [1, 2, 4, 8, 16]
 axis = [str(procs[i]) for i in range(len(procs))]
 
-times_case1 = [1.0,1.0,1.0,1.0,1.0]
-times_case2 = [1.0,0.9,0.8,0.7,0.6]
+times_case1 = [0.4121,0.2064,0.1039,0.0522,0.0258]
+times_case2 = [0.3889,0.1948,0.0987,0.0490,0.0244]
 
 ideal_speedup = procs
 experimental_speedup_case1 = [ times_case1[0]/x for x in times_case1 ]
