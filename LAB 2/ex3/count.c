@@ -33,23 +33,21 @@ int main (int argc, char **argv)
 	
    /* Create datatype */
     MPI_Datatype recordtype;
-    MPI_Type_contiguous (4, MPI_INT, &recordtype);
+	MPI_Datatype oldtypes[1];
+	int blockcounts[1];
+	MPI_Aint offsets[1];
+	
+	offsets[0] = 0;
+	oldtypes[0] = MPI_INT;
+	blockcounts[0] = 4;
+
+	MPI_Type_create_struct (1, blockcounts, offsets, oldtypes, &recordtype);
 	MPI_Type_commit (&recordtype);
 
 	tRecord *buf;
 	MPI_Status status;
 	MPI_Offset filesize,bufsize;
 	int recordtypesize, numrecords;
-	/* TEST 
-	MPI_Datatype recordtype;
-    int          blocklens[4] = {1,1,1,1};
-    MPI_Aint     lb,extent;
-	MPI_Type_get_extent(MPI_INT,&lb, &extent);
-	MPI_Aint	 offsets[4] = {0,extent,extent,extent};
-    MPI_Datatype old_types[4] = {MPI_INT, MPI_INT, MPI_INT, MPI_INT};
-
-	MPI_Type_create_struct (4, blocklens, offsets, old_types, &recordtype);
-	MPI_Type_commit (&recordtype);*/
 	
    /* Each process reads a part of the file */
 
@@ -67,17 +65,12 @@ int main (int argc, char **argv)
 	MPI_File_read (fh, buf, numrecords, recordtype, &status);
 
    /* Cound results by each process */
-	for(int i=rank;i<numrecords;i+= (nprocs*3)){
-		total += buf[i].no + buf[i].yes;
-      total += buf[i+1].no + buf[i+1].yes;
-      total += buf[i+2].no + buf[i+2].yes;
-	}
+	
    /* Print local results */
    printf ("Proc %3d. Counted votes = %d\n", rank, total);
    fflush (stdout);
 
    /* Print global results on process 0 */
-
    if (rank == 0)
    {
       total = 0;
