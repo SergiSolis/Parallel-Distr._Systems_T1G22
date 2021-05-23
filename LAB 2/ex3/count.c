@@ -24,19 +24,52 @@ int main (int argc, char **argv)
    long  totNo[MAX_QUEST];
 
    /* MPI Initialization */
-
+	MPI_Init(&argc,&argv);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+	
+	MPI_File fh;
+	MPI_File_open(MPI_COMM_WORLD, FILENAME,MPI_MODE_RDONLY,MPI_INFO_NULL,&fh);
+	
    /* Create datatype */
+    MPI_Datatype recordtype;
+    MPI_Type_contiguous (4, MPI_INT, &recordtype);
+	MPI_Type_commit (&recordtype);
 
+	tRecord *buf;
+	MPI_Status status;
+	MPI_Offset filesize,bufsize;
+	int recordtypesize, numrecords;
+	/* TEST 
+	MPI_Datatype recordtype;
+    int          blocklens[4] = {1,1,1,1};
+    MPI_Aint     lb,extent;
+	MPI_Type_get_extent(MPI_INT,&lb, &extent);
+	MPI_Aint	 offsets[4] = {0,extent,extent,extent};
+    MPI_Datatype old_types[4] = {MPI_INT, MPI_INT, MPI_INT, MPI_INT};
+
+	MPI_Type_create_struct (4, blocklens, offsets, old_types, &recordtype);
+	MPI_Type_commit (&recordtype);*/
+	
    /* Each process reads a part of the file */
 
    /* Each process determines number of records to read and initial offset */
+	MPI_File_get_size (fh, &filesize);
+	MPI_Type_size (recordtype, &recordtypesize);
+	bufsize = filesize/nprocs;
+    numrecords = bufsize/recordtypesize;
 
    /* Allocate buffer for records */
-
+   buf =  (tRecord*) malloc(numrecords*sizeof(tRecord));
+	
    /* Process reads numrecords consecutive elements */
+	MPI_File_seek (fh, rank*bufsize, MPI_SEEK_SET);
+	MPI_File_read (fh, buf, numrecords, recordtype, &status);
 
    /* Cound results by each process */
-
+	for(int i=0;i<numrecords;i++){
+		total += buf[i].no + buf[i].yes;
+	}
    /* Print local results */
    printf ("Proc %3d. Counted votes = %d\n", rank, total);
    fflush (stdout);
@@ -60,8 +93,10 @@ int main (int argc, char **argv)
    }
 
    /* Free datatype */
-
+	MPI_Type_free (&recordtype);
    /* End MPI */
+   MPI_File_close(&fh);
+   MPI_Finalize();
    return 0;
 }
 

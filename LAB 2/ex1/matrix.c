@@ -74,7 +74,7 @@ int main (int argc, char* argv[])
 	
    /* Communication: root gathers all the diagonals from the other ranks */
    
-	MPI_Gather(matrix,1,antidiagonaltype,result,size,MPI_INT,root,MPI_COMM_WORLD);
+	MPI_Gather(&matrix[size-1],1,antidiagonaltype,result,size,MPI_INT,root,MPI_COMM_WORLD);
 	
    /* Print final root matrix */
    if (rank == root) 
