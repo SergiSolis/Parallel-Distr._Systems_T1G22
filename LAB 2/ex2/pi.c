@@ -17,10 +17,10 @@ double pi_cont_dist (long nrect, int rank, int nprocs)
     double prect = nrect / nprocs;
 
     double a= 0;
-    double b=1;
+    double b= 1;
     double width = (b - a)/nrect;
     double x, local_sum = 0;
-    for (int i= rank * prect; i< (rank + 1) * prect;i++){
+    for (int i = rank * prect; i < (rank + 1) * prect;i++){
         x = a + (i-1)*width;
         local_sum += width * f(x);
     }
@@ -35,6 +35,20 @@ double pi_cont_dist (long nrect, int rank, int nprocs)
 double pi_gaps_dist (long nrect, int rank, int nprocs)
 {
    // TODO
+   
+    double a= 0;
+    double b= 1;
+    double width = (b - a)/nrect;
+    double x, local_sum = 0;
+    for (int i = rank; i < nrect;i+=rank){
+        x = a + (i-1)*width;
+        local_sum += width * f(x);   
+    }
+
+    double global_sum;
+
+    MPI_Reduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    return global_sum;
 }
 
 /* Main program */
@@ -77,14 +91,15 @@ int main (int argc, char *argv[])
    }
 
   /* Compute pi using distribution with gaps */
-
+  
+  start = MPI_Wtime();
   pi = pi_gaps_dist (nrect, rank, nprocs);
-
+  end = MPI_Wtime();
   if (rank == 0)
   {
-     //time = // TODO
+     time = end - start;
      printf("Pi    = %.16f \n", pi);
-     //printf("Time distr. with gaps = %.4f \n", time);
+     printf("Time distr. with gaps = %.4f \n", time);
      fflush(stdout);
    }
 
