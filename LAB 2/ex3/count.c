@@ -67,8 +67,10 @@ int main (int argc, char **argv)
 	MPI_File_read (fh, buf, numrecords, recordtype, &status);
 
    /* Cound results by each process */
-	for(int i=0;i<numrecords;i++){
+	for(int i=rank;i<numrecords;i+= (nprocs*3)){
 		total += buf[i].no + buf[i].yes;
+      total += buf[i+1].no + buf[i+1].yes;
+      total += buf[i+2].no + buf[i+2].yes;
 	}
    /* Print local results */
    printf ("Proc %3d. Counted votes = %d\n", rank, total);
