@@ -68,23 +68,26 @@ int main (int argc, char **argv)
 
    /* Cound results by each process */
    total = 0;
-   for(int i = 0; i < MAX_QUEST; i++){
-	   totYes[i] = 0;
-	   totNo[i] = 0;
-   }
+   long localYes[MAX_QUEST],localNo[MAX_QUEST];
+
 	for(int i = 0; i < numrecords; i++){
 		total = total + (buf[i].yes + buf[i].no);
 		switch(buf[i].idQuestion){
-			case 0: totYes[0] += buf[i].yes; totNo[0] += buf[i].no; break;
-			case 1: totYes[1] += buf[i].yes; totNo[1] += buf[i].no; break;
-			case 2: totYes[2] += buf[i].yes; totNo[2] += buf[i].no; break;
-			case 3: totYes[3] += buf[i].yes; totNo[3] += buf[i].no; break;
-			case 4: totYes[4] += buf[i].yes; totNo[4] += buf[i].no; break;
+			case 0: localYes[0] += buf[i].yes; localNo[0] += buf[i].no; break;
+			case 1: localYes[1] += buf[i].yes; localNo[1] += buf[i].no; break;
+			case 2: localYes[2] += buf[i].yes; localNo[2] += buf[i].no; break;
+			case 3: localYes[3] += buf[i].yes; localNo[3] += buf[i].no; break;
+			case 4: localYes[4] += buf[i].yes; localNo[4] += buf[i].no; break;
 		}
 	}
+
    /* Print local results */
    printf ("Proc %3d. Counted votes = %d\n", rank, total);
    fflush (stdout);
+   
+   MPI_Reduce(&localYes, &totYes, 5, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Reduce(&localNo, &totNo, 5, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Barrier(MPI_COMM_WORLD);
 
    /* Print global results on process 0 */
    if (rank == 0)
@@ -99,6 +102,7 @@ int main (int argc, char **argv)
       }
 
       printf ("------------------------------------------------------------\n");
+
       printf ("Total votes = %d\n", total);
       fflush (stdout);
    }
