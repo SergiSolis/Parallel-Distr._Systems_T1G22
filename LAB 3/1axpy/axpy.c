@@ -8,13 +8,20 @@
 
 void axpy_cpu(int offset, int n, double alpha, double* x, double* y)
 {
-    
+
+    for (int i = offset; i < n; i++){
+       y[i] =  alpha * x[i] + y[i];
+    }
 
 }
 
 void axpy_gpu(int offset, int n, double alpha, double* x, double* y)
 {
     
+    #pragma acc parallel loop 
+    for (int i = offset; i < n; i++){
+       y[i] =  alpha * x[i] + y[i];
+    }
 
 }
 
