@@ -18,15 +18,11 @@ void axpy_cpu(int offset, int n, double alpha, double* x, double* y)
 
 void axpy_gpu(int offset, int n, double alpha, double* x, double* y)
 {
-    
-    #pragma acc data copyin(x,y) copyout(y)
-    {
-        int end_offset = offset + n;
+    int end_offset = offset + n;
 
-        #pragma acc parallel loop present(x[offset:n], y[offset:n]) 
-        for (int i = offset; i < end_offset; i++){
-            y[i] =  alpha * x[i] + y[i];
-        }
+    #pragma acc parallel loop copyin(x[offset:end_offset]) copy(y[offset:end_offset])  
+	for (int i = offset; i < end_offset; i++){
+        y[i] =  alpha * x[i] + y[i];
     }
 
 }
@@ -80,10 +76,10 @@ int main()
 
    time_start = omp_get_wtime();
 
- 
+	#pragma acc enter data copyin(x[offset:length], y_gpu[offset:length])
     for( int i=0; i<100; i++)
         axpy_gpu(offset, length, alpha, x, y_gpu);
-
+	#pragma acc exit data delete(x[offset:length]) copyout(y_gpu[offset:length]) 
 
     time_end = omp_get_wtime();
     time_gpu = time_end - time_start;
