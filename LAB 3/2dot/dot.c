@@ -8,13 +8,22 @@
 
 double dot_product_cpu(int offset, int n, double* vector1, double* vector2)
 {
-
+    double total;
+    for (int i = offset; i < n; i++){
+        total += vector1[i] * vector2[i];
+    }
+    return total;
 }
 
 
 double dot_product_gpu(int offset, int n, double* vector1, double* vector2)
 {
-
+    double total;
+    #pragma acc parallel loop reduction(+:total)
+    for (int i = offset; i < n; i++){
+        total += vector1[i] * vector2[i];
+    }
+    return total;
 }
 
 
