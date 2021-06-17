@@ -20,8 +20,8 @@ double dot_product_cpu(int offset, int n, double* vector1, double* vector2)
 double dot_product_gpu(int offset, int n, double* vector1, double* vector2)
 {
     double total;
-	 int end_offset = offset + n;
-    #pragma acc parallel loop present(vector1[offset:end_offset],vector2[offset:end_offset]) reduction(+:total)
+	int end_offset = offset + n;
+    #pragma acc parallel loop present(vector1[offset:n],vector2[offset:n]) reduction(+:total)
     for (int i = offset; i < end_offset; i++){
         total += vector1[i] * vector2[i];
     }
@@ -72,7 +72,7 @@ int main()
 	 #pragma acc enter data copyin (vector1[offset:length],vector2[offset:length])
     for( int i=0; i<100; i++)
         dot_gpu = dot_product_gpu(offset, length, vector1, vector2);
-	#pragma acc exit data delete (vector1[offset:length],vector2[offset:length])
+	#pragma acc exit data delete (vector1[offset:length],vector2[offset:length]) 
     time_end = omp_get_wtime();
     time_gpu = time_end - time_start;
 

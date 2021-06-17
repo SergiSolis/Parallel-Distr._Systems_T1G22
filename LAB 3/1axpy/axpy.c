@@ -20,7 +20,7 @@ void axpy_gpu(int offset, int n, double alpha, double* x, double* y)
 {
     int end_offset = offset + n;
 
-    #pragma acc parallel loop copyin(x[offset:end_offset]) copy(y[offset:end_offset])  
+    #pragma acc parallel loop copyin(x[offset:n]) copy(y[offset:n])  
 	for (int i = offset; i < end_offset; i++){
         y[i] =  alpha * x[i] + y[i];
     }
