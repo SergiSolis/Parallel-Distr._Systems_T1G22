@@ -119,16 +119,30 @@ int main()
 
 
     // Allocate arrays in GPU
-
+	
+	cudaMalloc(&dx,vec_size*sizeof(double));
+	cudaMalloc(&dy_gpu,vec_size*sizeof(double));
+	cudaMalloc(&dAvals,vec_size*ROWSIZE*sizeof(double));
+	cudaMalloc(&dAcols,vec_size*ROWSIZE*sizeof(int));
 
     // Transfer data to GPU
-
+	
+	cudaMemcpy(dx,x,vec_size*sizeof(double),cudaMemcpyHostToDevice); //segundo argumento creo que esta mal de todos
+    cudaMemcpy(dy_gpu,y_gpu,vec_size*sizeof(double),cudaMemcpyHostToDevice);
+    cudaMemcpy(dAvals,Avals,vec_size*ROWSIZE*sizeof(double),cudaMemcpyHostToDevice);
+	cudaMemcpy(dAcols,Acols,vec_size*ROWSIZE*sizeof(int),cudaMemcpyHostToDevice);
 
     //Calculate threads and blocks
+	int threads;
+	int blocks;
 
+	threads = 512;
+	blocks = N;
 
     //Create the gridBlock
-
+	dim3 gridBlocks(blocks,1,1);
+	dim3 gridThreads(threads,1,1);
+	
     for( int i=0; i<100; i++){
         //call your GPU kernel here
         
@@ -136,9 +150,16 @@ int main()
     }
 
     // Transfer your result back
-
+	
+	cudaMemcpy(y_gpu,dy_gpu,vec_size*sizeof(double),cudaMemcpyDeviceToHost);
+	
     // Free arrays in GPU
-
+	
+	cudaFree(dx);
+	cudaFree(dy_gpu);
+	cudaFree(dAvals);
+	cudaFree(dAcols);
+	
 
 
     //Comparison between gpu and cpu results
