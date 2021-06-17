@@ -15,7 +15,12 @@ __global__ void cuspmv(int offset, int nsize, double* dvals, int *dcols, double*
 
 void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double* y)
 {
-
+	int end_offset = offset + nsize;
+		for(int i = offset; i < end_offset; i++){
+			for(int j = 0; j < ROWSIZE; j++){
+				y[i] += vals[(ROWSIZE*i) + j] * x[cols[(ROWSIZE*i) + j]];
+			}
+		}
 }
 
 

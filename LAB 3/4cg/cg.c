@@ -8,7 +8,16 @@
 #define N 1024
 #define ROWSIZE 9
 
+void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double* y) //modificar si se cambia el codigo del ex3
+{
+	int end_offset = offset + nsize;
+	for(int i = offset; i < end_offset; i++){
+		for(int j = 0; j < ROWSIZE; j++){
+			y[i] += vals[(ROWSIZE*i) + j] * x[cols[(ROWSIZE*i) + j]];
+		}
+	}
 
+}
 
 void spmv_gpu(int offset, int nsize, double* vals, int* cols, double* x, double* y)
 {

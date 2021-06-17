@@ -8,8 +8,8 @@
 
 double dot_product_cpu(int offset, int n, double* vector1, double* vector2)
 {
-    double total;
-	 int end_offset = offset + n;
+    double total = 0;
+	int end_offset = offset + n;
     for (int i = offset; i < end_offset; i++){
         total += vector1[i] * vector2[i];
     }
@@ -19,7 +19,7 @@ double dot_product_cpu(int offset, int n, double* vector1, double* vector2)
 
 double dot_product_gpu(int offset, int n, double* vector1, double* vector2)
 {
-    double total;
+    double total = 0;
 	int end_offset = offset + n;
     #pragma acc parallel loop present(vector1[offset:n],vector2[offset:n]) reduction(+:total)
     for (int i = offset; i < end_offset; i++){
