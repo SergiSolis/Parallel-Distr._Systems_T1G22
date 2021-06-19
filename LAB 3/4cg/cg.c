@@ -22,7 +22,7 @@ void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double*
 void spmv_gpu(int offset, int nsize, double* vals, int* cols, double* x, double* y)
 {
 	int end_offset = offset + nsize;
-	#pragma acc parallel loop 
+	#pragma acc parallel loop present(vals[(offset*ROWSIZE):(N*N*ROWSIZE)],cols[(offset*ROWSIZE):(N*N*ROWSIZE)],x[0:N*N],y[offset:nsize]) //N*N represents vec_size
 	for(int i = offset; i < end_offset; i++){
 		#pragma acc loop seq
 		for(int j = 0; j < ROWSIZE; j++){
@@ -118,7 +118,7 @@ void create_solution_and_rhs(int vecsize, double* Avals, int* Acols, double* xso
 
 void cg_gpu(int offset, int length, double* Avals, int* Acols, double* rhs, double* x)
 {
-
+	#pragma acc data present (Avals[(offset*ROWSIZE):(N*N*ROWSIZE)],Acols[(offset*ROWSIZE):(N*N*ROWSIZE)],rhs[0:N*N],x[0:N*N])
     int iterations= 500;
 
     double *Ax, *r0, *p0;
@@ -128,39 +128,40 @@ void cg_gpu(int offset, int length, double* Avals, int* Acols, double* rhs, doub
     r0 = (double*) malloc (length*sizeof(double));
     p0 = (double*) malloc (length*sizeof(double));
 
-
-
+	int end_offset = offset + length;
+	#pragma enter data copyin (r0[offset:end_offset],p0[offset:end_offset],Ax[offset:end_offset])
+	
     for(int i=offset; i< length; i++)
     {
         r0[i] = rhs[i];
     }
-
+	
+	
     spmv_gpu(offset, length, Avals, Acols, x , Ax);
-    
+    #pragma acc update self(Ax[offset:end_offset])
 
     axpy_gpu(offset, length, -1.0, Ax, r0);
-
-
+	#pragma acc update self(r0[offset:end_offset])
+	
     for(int i=offset; i< length; i++)
     {
         p0[i] = r0[i];
     }
 
-
     for( int k=0; k < iterations; k++) 
     {
 
         spmv_gpu(offset, length, Avals, Acols, p0 , Ax);
- 
+		#pragma acc update self(Ax[offset:end_offset])
         rho0 = dot_product_gpu(offset, length, r0, r0);
         denom = dot_product_gpu(offset, length, p0, Ax);
 
         alpha = rho0/denom;
 
         axpy_gpu( offset, length, alpha, p0, x);
-
+		#pragma acc update self(x[offset:end_offset])
         axpy_gpu( offset, length, -1.0*alpha, Ax, r0);
-
+		#pragma acc update self(r0[offset:end_offset])
         rho1 = dot_product_gpu (offset, length, r0 ,r0 );
 
         if(k % 20 == 0)
@@ -168,10 +169,10 @@ void cg_gpu(int offset, int length, double* Avals, int* Acols, double* rhs, doub
 
 
         beta = rho1/rho0;
-
         for(int i=offset; i< length; i++)
             p0[i] = r0[i] + beta*p0[i];
     }
+	#pragma exit data delete (r0[offset:end_offset],p0[offset:end_offset],Ax[offset:end_offset])
 
 }
 
@@ -223,11 +224,12 @@ int main()
 
     time_start = omp_get_wtime();
 
-
-    cg_gpu(offset, length, Avals, Acols, rhs, x_gpu);
-
-    time_end = omp_get_wtime();
-
+	#pragma acc enter data copyin (Avals[(offset*ROWSIZE):(vec_size*ROWSIZE)],Acols[(offset*ROWSIZE):(vec_size*ROWSIZE)],rhs[0:vec_size],x_gpu[0:vec_size])
+    cg_gpu(offset, length, Avals, Acols, rhs, x_gpu);	
+	#pragma acc exit data delete (Avals[(offset*ROWSIZE):(vec_size*ROWSIZE)],Acols[(offset*ROWSIZE):(vec_size*ROWSIZE)],rhs[0:vec_size])copyout (x_gpu[0:vec_size])
+	
+	time_end = omp_get_wtime();
+	
     time_gpu = time_end - time_start;
 
 
