@@ -8,7 +8,7 @@
 #define N 1024
 #define ROWSIZE 9
 
-void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double* y) //modificar si se cambia el codigo del ex3
+void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double* y) 
 {
 	int end_offset = offset + nsize;
 	for(int i = offset; i < end_offset; i++){
@@ -21,18 +21,39 @@ void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double*
 
 void spmv_gpu(int offset, int nsize, double* vals, int* cols, double* x, double* y)
 {
+	int end_offset = offset + nsize;
+	#pragma acc parallel loop 
+	for(int i = offset; i < end_offset; i++){
+		#pragma acc loop seq
+		for(int j = 0; j < ROWSIZE; j++){
+			y[i] += vals[(ROWSIZE*i) + j] * x[cols[(ROWSIZE*i) + j]];
+		}
+	}
 }
 
 
 
 void axpy_gpu(int offset, int nsize, double alpha, double* x, double* y)
 {
+	int end_offset = offset + nsize;
+
+    #pragma acc parallel loop present(x[offset:nsize],y[offset:nsize])  
+	for (int i = offset; i < end_offset; i++){
+        y[i] =  alpha * x[i] + y[i];
+    }
 }
 
 
 
 double dot_product_gpu(int offset, int nsize, double* vector1, double* vector2)
 {
+	double total = 0;
+	int end_offset = offset + nsize;
+    #pragma acc parallel loop present(vector1[offset:nsize],vector2[offset:nsize]) reduction(+:total)
+    for (int i = offset; i < end_offset; i++){
+        total += vector1[i] * vector2[i];
+    }
+    return total;
 }
 
 
@@ -113,7 +134,6 @@ void cg_gpu(int offset, int length, double* Avals, int* Acols, double* rhs, doub
     {
         r0[i] = rhs[i];
     }
-
 
     spmv_gpu(offset, length, Avals, Acols, x , Ax);
     

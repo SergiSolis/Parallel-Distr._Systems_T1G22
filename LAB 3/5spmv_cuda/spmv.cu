@@ -9,6 +9,15 @@
 __global__ void cuspmv(int offset, int nsize, double* dvals, int *dcols, double* dx, double *dy)
 {
 
+	
+	int id = threadIdx.x+blockIdx.x*blockDim.x;
+	double sum = 0;
+
+	if(id<offset+nsize){
+		for(int j=0; j<ROWSIZE; ++j)
+			sum += dvals[id*ROWSIZE+j]*dx[dcols[id*ROWSIZE+j]];
+		dy[id] = sum;
+	}
 
 }
 
@@ -116,6 +125,11 @@ int main()
 
     double* dAvals;
     int*    dAcols;
+	
+	 // Events created to measure times
+    cudaEvent_t  start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
 
 
     // Allocate arrays in GPU
@@ -137,21 +151,30 @@ int main()
 	int blocks;
 
 	threads = 512;
-	blocks = N;
+	blocks = (vec_size+threads-1)/threads;
 
     //Create the gridBlock
 	dim3 gridBlocks(blocks,1,1);
 	dim3 gridThreads(threads,1,1);
 	
+	cudaEventRecord(start);
+	
     for( int i=0; i<100; i++){
-        //call your GPU kernel here
-        
-
+		cuspmv<<<gridBlocks,gridThreads>>>(offset,vec_size,dAvals,dAcols,dx,dy_gpu);
     }
+	
+	cudaEventRecord(stop);
 
     // Transfer your result back
 	
 	cudaMemcpy(y_gpu,dy_gpu,vec_size*sizeof(double),cudaMemcpyDeviceToHost);
+	
+	//Getting the measurement
+   cudaEventSynchronize(stop);
+   float milliseconds = 0;
+   cudaEventElapsedTime(&milliseconds, start, stop);
+
+   printf("The elapsed time is %f (s)\n",milliseconds/1000);
 	
     // Free arrays in GPU
 	

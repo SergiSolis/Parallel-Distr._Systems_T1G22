@@ -23,7 +23,7 @@ void spmv_cpu(int offset, int nsize, double* vals, int* cols, double* x, double*
 void spmv_gpu(int offset, int nsize, double* vals, int* cols, double* x, double* y)
 {
 	int end_offset = offset + nsize;
-	#pragma acc parallel loop 
+	#pragma acc parallel loop present(vals[(offset*ROWSIZE):(N*N*ROWSIZE)],cols[(offset*ROWSIZE):(N*N*ROWSIZE)],x[0:N*N],y[offset:nsize]) //N*N represents vec_size
 	for(int i = offset; i < end_offset; i++){
 		#pragma acc loop seq
 		for(int j = 0; j < ROWSIZE; j++){
@@ -138,10 +138,10 @@ int main()
 
 
     time_start = omp_get_wtime();
-	#pragma acc enter data copyin (Avals[offset:(vec_size*ROWSIZE)],Acols[offset:(vec_size*ROWSIZE)],x[0:vec_size],y_gpu[offset:length])
+	#pragma acc enter data copyin (Avals[(offset*ROWSIZE):(vec_size*ROWSIZE)],Acols[(offset*ROWSIZE):(vec_size*ROWSIZE)],x[0:vec_size],y_gpu[offset:length])
     for( int i=0; i<100; i++)
         spmv_gpu(offset, length, Avals, Acols, x, y_gpu);
-	#pragma acc exit data delete (Avals[offset:(vec_size*ROWSIZE)],Acols[offset:(vec_size*ROWSIZE)],x[0:vec_size])copyout(y_gpu[offset:length])
+	#pragma acc exit data delete (Avals[(offset*ROWSIZE):(vec_size*ROWSIZE)],Acols[(offset*ROWSIZE):(vec_size*ROWSIZE)],x[0:vec_size])copyout(y_gpu[offset:length])
     time_end = omp_get_wtime();
 
     time_gpu = time_end - time_start;
